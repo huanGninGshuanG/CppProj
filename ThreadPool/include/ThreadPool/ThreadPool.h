@@ -16,17 +16,21 @@ namespace tp {
         using task_t = std::function<void(size_t)>;
         tp::MTQueue<task_t> m_tasks;
         std::vector<std::thread> m_threads;
+
+        void init_thread(size_t idx) {
+            m_threads[idx] = std::thread([this, idx]() {
+                while(true) {
+                    task_t task = std::move(m_tasks.pop());
+                    if(!task) break;
+                    task(idx);
+                }
+            });
+        }
     public:
         explicit ThreadPool(size_t n=std::thread::hardware_concurrency()) {
-            m_threads.reserve(n);
+            m_threads.resize(n);
             for(size_t i=0; i<n; i++) {
-                m_threads.emplace_back(std::thread([this, i]() {
-                    while(true) {
-                        task_t task = std::move(m_tasks.pop());
-                        if(!task) break;
-                        task(i);
-                    }
-                }));
+                init_thread(i);
             }
         }
 
