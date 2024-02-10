@@ -3,7 +3,6 @@
 #include <ThreadPool/ThreadPool.h>
 
 void  arg(int idx, int &x) {
-//    std::cout<<"this is "<<idx<<" with "<<x<<std::endl;
     x++;
 }
 
@@ -12,6 +11,11 @@ int main() {
     tp::ThreadPool tp;
     for(int i=0; i<100000; i++) {
         auto fret = tp.push(arg, x);
+        fret.wait();
+        if(i==100000/2) {
+            tp.stop(true);
+            break;
+        }
     }
     std::cout << "value is: "<< x << std::endl;
     return 0;

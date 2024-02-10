@@ -29,6 +29,13 @@ namespace tp {
             return ret;
         }
 
+        void clear() {
+            std::unique_lock grd(m_mtx);
+            while(!m_q.empty()) {
+                m_q.pop();
+            }
+        }
+
         bool empty() const {
             std::unique_lock grd(m_mtx);
             return m_q.empty();
